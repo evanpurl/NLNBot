@@ -8,7 +8,7 @@ from util.sqlitefunctions import create_db, gettickets
 
 
 def searchembed(user, tickets):
-    embed = discord.Embed(title=f"{user.name}", description=f"Found {len(tickets)} ticket(s)", color=discord.Color.blue(),
+    embed = discord.Embed(title=f"{user.name}'s ticket history:", description=f"Found {len(tickets)} ticket(s)", color=discord.Color.blue(),
                           timestamp=datetime.datetime.now())
     embed.set_author(name=user.name, icon_url=user.avatar)
     if len(tickets) == 0:
