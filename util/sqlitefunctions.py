@@ -22,7 +22,6 @@ async def create_table(conn, tabledata):
         c = conn.cursor()
         c.execute(tabledata)
         c.close()
-        await createuniqueindex(conn)
 
     except Error or Exception as e:
         print(f"create table: {e}")
@@ -54,12 +53,34 @@ async def createuniqueindex(conn):
         print(f"createuniqueindex: {e}")
 
 
-def getconfig(conn, configoption):
+async def getconfig(conn, configoption):
     try:
         c = conn.cursor()
         c.execute(""" SELECT option FROM config WHERE configname=? """, [configoption])
         option = c.fetchone()
+        if len(option) == 0:
+            return 0
         return option[0]
     except Error or Exception as e:
         print(f"get config: {e}")
         return []
+
+
+async def gettickets(conn, userid):
+    try:
+        c = conn.cursor()
+        c.execute(""" SELECT * FROM tickets WHERE ticketuserid = ? LIMIT 10;""", [str(userid)])
+        tickets = c.fetchall()
+        return tickets
+    except Exception as e:
+        print(e)
+
+
+async def newticket(conn, guild, ticketuserid, transcriptlink):
+    datatoinsert = f""" INSERT INTO tickets(servername, ticketuserid, transcriptlink) VALUES( ?, ?, ?);"""
+    c = conn.cursor()
+    c.execute(datatoinsert,
+              (str(guild.name), str(ticketuserid), str(transcriptlink)))
+    conn.commit()
+    c.close()
+    conn.close()

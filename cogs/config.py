@@ -36,13 +36,13 @@ class setcmd(commands.GroupCog, name="set"):
             await interaction.response.send_message(content=f"""Something went wrong.""", ephemeral=True)
 
     @app_commands.checks.has_permissions(manage_channels=True)
-    @app_commands.command(name="report-category", description="Command to set your server's report category.")
-    async def reportcategory(self, interaction: discord.Interaction, category: discord.CategoryChannel):
+    @app_commands.command(name="ticket-category", description="Command to set your server's ticket category.")
+    async def ticketcategory(self, interaction: discord.Interaction, category: discord.CategoryChannel):
         try:
             conn = await create_db(f"storage/{interaction.guild.id}/configuration.db")
-            await insertconfig(conn, ["reportcategoryid", category.id])
+            await insertconfig(conn, ["ticketcategoryid", category.id])
             await interaction.response.send_message(
-                f"Report Category has been set to {discord.utils.get(interaction.guild.categories, id=category.id)}.",
+                f"Ticket Category has been set to {discord.utils.get(interaction.guild.categories, id=category.id)}.",
                 ephemeral=True)
         except Exception as e:
             print(e)
@@ -75,9 +75,9 @@ class setcmd(commands.GroupCog, name="set"):
             await interaction.response.send_message(content=f"""Something went wrong.""", ephemeral=True)
 
     @welcomechannel.error
-    @reportcategory.error
     @transcriptlogchannel.error
     @defaultrole.error
+    @ticketcategory.error
     async def onerror(self, interaction: discord.Interaction, error: app_commands.MissingPermissions):
         await interaction.response.send_message(content=error,
                                                 ephemeral=True)
@@ -89,7 +89,7 @@ class resetcmd(commands.GroupCog, name="reset"):
         self.bot = bot
 
     @app_commands.checks.has_permissions(manage_channels=True)
-    @app_commands.command(name="welcome-channel", description="Command to set your server's welcome channel.")
+    @app_commands.command(name="welcome-channel", description="Command to reset your server's welcome channel.")
     async def welcomechannel(self, interaction: discord.Interaction):
         try:
             conn = await create_db(f"storage/{interaction.guild.id}/configuration.db")
@@ -102,7 +102,7 @@ class resetcmd(commands.GroupCog, name="reset"):
             await interaction.response.send_message(content=f"""Something went wrong.""", ephemeral=True)
 
     @app_commands.checks.has_permissions(manage_channels=True)
-    @app_commands.command(name="goodbye-channel", description="Command to set your server's goodbye channel.")
+    @app_commands.command(name="goodbye-channel", description="Command to reset your server's goodbye channel.")
     async def goodbyechannel(self, interaction: discord.Interaction):
         try:
             conn = await create_db(f"storage/{interaction.guild.id}/configuration.db")
@@ -115,13 +115,13 @@ class resetcmd(commands.GroupCog, name="reset"):
             await interaction.response.send_message(content=f"""Something went wrong.""", ephemeral=True)
 
     @app_commands.checks.has_permissions(manage_channels=True)
-    @app_commands.command(name="report-category", description="Command to set your server's report category.")
-    async def reportcategory(self, interaction: discord.Interaction):
+    @app_commands.command(name="ticket-category", description="Command to reset your server's ticket category.")
+    async def ticketcategory(self, interaction: discord.Interaction):
         try:
             conn = await create_db(f"storage/{interaction.guild.id}/configuration.db")
-            await insertconfig(conn, ["reportcategoryid", 0])
+            await insertconfig(conn, ["ticketcategoryid", 0])
             await interaction.response.send_message(
-                f"Report Category has been reset.",
+                f"Ticket Category has been reset.",
                 ephemeral=True)
         except Exception as e:
             print(e)
@@ -142,7 +142,7 @@ class resetcmd(commands.GroupCog, name="reset"):
             await interaction.response.send_message(content=f"""Something went wrong.""", ephemeral=True)
 
     @app_commands.checks.has_permissions(manage_roles=True)
-    @app_commands.command(name="default-role", description="Command for resetting your server's Default role.")
+    @app_commands.command(name="default-role", description="Command to reset your server's Default role.")
     async def defaultrole(self, interaction: discord.Interaction):
         try:
             conn = await create_db(f"storage/{interaction.guild.id}/configuration.db")
@@ -154,9 +154,9 @@ class resetcmd(commands.GroupCog, name="reset"):
             await interaction.response.send_message(content=f"""Something went wrong.""", ephemeral=True)
 
     @welcomechannel.error
-    @reportcategory.error
     @transcriptlogchannel.error
     @defaultrole.error
+    @ticketcategory.error
     async def onerror(self, interaction: discord.Interaction, error: app_commands.MissingPermissions):
         await interaction.response.send_message(content=error,
                                                 ephemeral=True)
