@@ -1,7 +1,17 @@
-import asyncio
 import os
 import subprocess
 import sys
+
+
+def install_requirements():
+    subprocess.check_call([sys.executable, '-m', 'pip', 'install', '--upgrade', 'pip'])
+    if os.path.exists('requirements.txt'):
+        subprocess.check_call([sys.executable, '-m', 'pip', 'install', '-r', 'requirements.txt'])
+
+
+install_requirements()
+
+import asyncio
 
 import discord
 from util.load_extensions import load_extensions  # Our code
@@ -17,15 +27,8 @@ client = commands.Bot(command_prefix="$", intents=intents)
 load_dotenv()
 
 
-async def install_requirements():
-    subprocess.check_call([sys.executable, '-m', 'pip', 'install', '--upgrade', 'pip'])
-    if os.path.exists('requirements.txt'):
-        subprocess.check_call([sys.executable, '-m', 'pip', 'install', '-r', 'requirements.txt'])
-
-
 # Main function to load extensions and then load bot.
 async def main():
-    await install_requirements()
     async with client:
         try:
             token = os.getenv('token')
