@@ -1,4 +1,3 @@
-import argparse
 import asyncio
 import os
 import subprocess
@@ -17,12 +16,11 @@ client = commands.Bot(command_prefix="$", intents=intents)
 
 load_dotenv()
 
-parser = argparse.ArgumentParser(description='Nite Life Network Bot')
-
 
 async def install_requirements():
     subprocess.check_call([sys.executable, '-m', 'pip', 'install', '--upgrade', 'pip'])
-    subprocess.check_call([sys.executable, '-m', 'pip', 'install', '-r', 'requirements.txt'])
+    if os.path.exists('requirements.txt'):
+        subprocess.check_call([sys.executable, '-m', 'pip', 'install', '-r', 'requirements.txt'])
 
 
 # Main function to load extensions and then load bot.
