@@ -153,10 +153,24 @@ class resetcmd(commands.GroupCog, name="reset"):
             print(e)
             await interaction.response.send_message(content=f"""Something went wrong.""", ephemeral=True)
 
+    @app_commands.checks.has_permissions(manage_channels=True)
+    @app_commands.command(name="transaction-category", description="Command to set your server's transaction category.")
+    async def transactioncategory(self, interaction: discord.Interaction, category: discord.CategoryChannel):
+        try:
+            conn = await create_db(f"storage/{interaction.guild.id}/configuration.db")
+            await insertconfig(conn, ["transactioncategoryid", category.id])
+            await interaction.response.send_message(
+                f"Transaction Category has been set to {discord.utils.get(interaction.guild.categories, id=category.id)}.",
+                ephemeral=True)
+        except Exception as e:
+            print(e)
+            await interaction.response.send_message(content=f"""Something went wrong.""", ephemeral=True)
+
     @welcomechannel.error
     @transcriptlogchannel.error
     @defaultrole.error
     @ticketcategory.error
+    @transactioncategory.error
     async def onerror(self, interaction: discord.Interaction, error: app_commands.MissingPermissions):
         await interaction.response.send_message(content=error,
                                                 ephemeral=True)
