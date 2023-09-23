@@ -41,9 +41,8 @@ async def insertconfig(conn, configlist):
         print(f"insert config: {e}")
 
 
-async def createuniqueindex(conn):
+async def createuniqueindex(conn, datatoinsert):
     try:
-        datatoinsert = f""" CREATE UNIQUE INDEX IF NOT EXISTS idx_config ON config (configname) """
         c = conn.cursor()
         c.execute(datatoinsert)
         conn.commit()
@@ -61,6 +60,21 @@ async def getconfig(conn, configoption):
         if len(option) == 0:
             return 0
         return option[0]
+    except Error or Exception as e:
+        print(f"get config: {e}")
+        return []
+
+
+async def getprofileconfig(conn, userid):
+    try:
+        c = conn.cursor()
+        c.execute(""" SELECT * FROM profiles WHERE userid=? """, [str(userid)])
+        option = c.fetchone()
+        if option is None:
+            return None
+        if len(option) == 0:
+            return 0
+        return option
     except Error or Exception as e:
         print(f"get config: {e}")
         return []

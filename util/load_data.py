@@ -1,6 +1,7 @@
 import os.path
 from sqlite3 import Error
 
+from cogs.profiles import initprofiles
 from util.sqlitefunctions import create_db, create_table, createuniqueindex
 
 
@@ -27,7 +28,8 @@ async def loaddata(guildid):
         tabledata = """CREATE TABLE IF NOT EXISTS config ( configname text NOT NULL, option integer);"""
         conn = await create_db(f"storage/{guildid}/configuration.db")
         await create_table(conn, tabledata)
-        await createuniqueindex(conn)
+        await createuniqueindex(conn, f""" CREATE UNIQUE INDEX IF NOT EXISTS idx_config ON config (configname) """)
+        await initprofiles(guildid)
         # Will add more files as needed.
         print("Data confirmed!")
     except Error or Exception as e:

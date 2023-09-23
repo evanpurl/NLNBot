@@ -48,12 +48,10 @@ class updatecmd(commands.Cog):
     @commands.has_permissions(manage_channels=True)
     @app_commands.command(name="update", description="Command used to create an update Embed.")
     @app_commands.choices(topic=[
-        app_commands.Choice(name='General', value=1),
-        app_commands.Choice(name='Discord', value=2),
-        app_commands.Choice(name='Tycoon', value=3),
-        app_commands.Choice(name='LifeSteal', value=4),
-        app_commands.Choice(name='Applications', value=5),
-        app_commands.Choice(name='Other', value=6),
+        app_commands.Choice(name='Discord', value=1),
+        app_commands.Choice(name='Space Engineers', value=2),
+        app_commands.Choice(name='Minecraft', value=3),
+        app_commands.Choice(name='Other', value=4),
     ])
     async def update(self, interaction: discord.Interaction, topic: app_commands.Choice[int], channel: discord.TextChannel):
         try:
