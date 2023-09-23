@@ -30,7 +30,6 @@ class transactioncmd(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.has_permissions(manage_roles=True)
     @app_commands.command(name="transaction", description="Command used to start a transaction with a player.")
     async def transaction(self, interaction: discord.Interaction, member: discord.Member):
         try:
