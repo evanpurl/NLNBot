@@ -1,7 +1,3 @@
-import asyncio
-import datetime
-import io
-import chat_exporter
 import discord
 from discord import app_commands
 from discord.ext import commands
@@ -45,15 +41,11 @@ class transactioncmd(commands.Cog):
             transactioncat = discord.utils.get(interaction.guild.categories, id=int(cat))
             if transactioncat:
                 transactionchan = await interaction.guild.create_text_channel(
-                    f"transaction-{interaction.user.name}-{member.mention}", category=transactioncat,
+                    f"transaction-{interaction.user.name}-{member.name}", category=transactioncat,
                     overwrites=overwrites)
-                await interaction.response.send_message(content=f"Transaction started: {transactionchan.mention}!",
-                                                        ephemeral=True)
-                await transactionchan.send(
-                    content=f"{interaction.user.mention} started a transaction with {member.mention}")
             else:
                 transactionchan = await interaction.guild.create_text_channel(
-                    f"transaction-{interaction.user.name}-{member.mention}",
+                    f"transaction-{interaction.user.name}-{member.name}",
                     overwrites=overwrites)
             await interaction.response.send_message(content=f"Transaction started: {transactionchan.mention}!",
                                                     ephemeral=True)
