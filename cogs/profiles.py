@@ -49,7 +49,7 @@ async def assembleprofileembed(bot, server, user):
     profile = await getprofile(server.id, user.id)
 
     embed = discord.Embed(title=f"{user.name}'s Profile", color=discord.Color.blue(),
-                          timestamp=datetime.datetime.now(), )
+                          timestamp=datetime.datetime.now())
     embed.set_thumbnail(url=server.icon.url)
     embed.set_author(name=bot.user.name, icon_url=bot.user.avatar)
     embed.add_field(name="Pronouns", value=profile[1], inline=True)
@@ -96,7 +96,6 @@ class profilecmd(commands.Cog):
     @app_commands.command(name="edit-profile", description="Command used to edit your profile")
     async def editprofile(self, interaction: discord.Interaction):
         try:
-            currentprofile = await getprofile(interaction.guild.id, interaction.user.id)
             await interaction.response.send_modal(profilemodal(self.bot))
 
         except Exception as e:

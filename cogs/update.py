@@ -6,9 +6,9 @@ from discord.ext import commands
 
 
 async def assembleembed(bot, server, choice, added, removed, updated):
-    embed = discord.Embed(title=f"{server.name} | New Updates",
+    embed = discord.Embed(title=f"{server.name} | Update",
                           description=f"Here are the current updates for **{choice}**", color=discord.Color.blue(),
-                          timestamp=datetime.datetime.now(), )
+                          timestamp=datetime.datetime.now())
     embed.set_thumbnail(url=server.icon.url)
     embed.set_author(name=bot.user.name, icon_url=bot.user.avatar)
     embed.add_field(name="Added", value=added, inline=False)
@@ -25,14 +25,20 @@ class Updatemodal(ui.Modal, title='Update Information'):
         self.channel = channel
         self.topic = topic
 
-    added = ui.TextInput(label='Added:', style=discord.TextStyle.long,
+    added = ui.TextInput(label='Added:', style=discord.TextStyle.paragraph,
                          placeholder="N/A", required=False)
-    removed = ui.TextInput(label='Removed:', style=discord.TextStyle.long,
+    removed = ui.TextInput(label='Removed:', style=discord.TextStyle.paragraph,
                            placeholder="N/A", required=False)
-    updated = ui.TextInput(label='Updated:', style=discord.TextStyle.long,
+    updated = ui.TextInput(label='Updated:', style=discord.TextStyle.paragraph,
                            placeholder="N/A", required=False)
 
     async def on_submit(self, interaction: discord.Interaction):
+        if self.added.value == "":
+            self.added = "N/A"
+        if self.removed.value == "":
+            self.removed = "N/A"
+        if self.updated.value == "":
+            self.updated = "N/A"
 
         await self.channel.send(
             embed=await assembleembed(self.bot, interaction.guild, self.topic, self.added, self.removed, self.updated))
