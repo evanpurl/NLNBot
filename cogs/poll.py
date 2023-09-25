@@ -58,7 +58,7 @@ class pollmodal(ui.Modal, title='Poll Information'):
             msgid = msg.id
 
             if self.time != 0:
-                self.time = self.time * 60  # Converts timer from hours to seconds.
+                self.time = self.time * 3600  # Converts timer from hours to seconds.
 
                 await interaction.response.send_message(
                     content=f"Poll created at {msg.jump_url}, timer started for {self.timehours} hours.",
