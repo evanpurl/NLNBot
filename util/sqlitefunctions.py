@@ -57,6 +57,8 @@ async def getconfig(conn, configoption):
         c = conn.cursor()
         c.execute(""" SELECT option FROM config WHERE configname=? """, [configoption])
         option = c.fetchone()
+        if not option:
+            return 0
         if len(option) == 0:
             return 0
         return option[0]

@@ -7,6 +7,7 @@ import stripe
 from discord import app_commands
 from discord.ext import commands
 
+from util.sqlitefunctions import create_db, getconfig
 
 stripe.api_key = os.getenv('stripesecret')
 
@@ -49,16 +50,34 @@ class donationcmd(commands.Cog):
 
             embed = discord.Embed(title=self.bot.user.name,
                                   color=0x00ff00)
-            embed.add_field(name="Donation Link", value=f"[here]({session.url})")
+            embed.add_field(name="Donation Link", value=f"[Donation Link]({session.url})")
 
             await interaction.response.send_message(embed=embed, ephemeral=True)
 
             while session.payment_status != "paid":
                 await asyncio.sleep(1)
                 session = stripe.checkout.Session.retrieve(session.id)
-            embed = discord.Embed(title=self.bot.user.name,
-                                  description=f"Thank you for donating {interaction.user.mention}!",
-                                  color=0x00ff00)
+
+            conn = await create_db(f"storage/{interaction.guild.id}/configuration.db")
+            roleid = await getconfig(conn, "supporterroleid")
+            role = discord.utils.get(interaction.guild.roles, id=roleid)
+
+            if role:
+                if role not in interaction.user.roles:
+                    await interaction.user.add_roles(role)
+                    embed = discord.Embed(title=self.bot.user.name,
+                                          description=f"Thank you for donating {interaction.user.mention}, you "
+                                                      f"have been given the role {role.mention}!",
+                                          color=0x00ff00)
+                else:
+                    embed = discord.Embed(title=self.bot.user.name,
+                                          description=f"Thank you for donating {interaction.user.mention}!",
+                                          color=0x00ff00)
+            else:
+                embed = discord.Embed(title=self.bot.user.name,
+                                      description=f"Thank you for donating {interaction.user.mention}!",
+                                      color=0x00ff00)
+
             await interaction.followup.send(embed=embed, ephemeral=True)
         except Exception as e:
             print(e)

@@ -87,6 +87,18 @@ class setcmd(commands.GroupCog, name="set"):
             print(e)
             await interaction.response.send_message(content=f"""Something went wrong.""", ephemeral=True)
 
+    @app_commands.checks.has_permissions(manage_roles=True)
+    @app_commands.command(name="supporter-role", description="Command for setting your server's supporter role.")
+    async def supporterrole(self, interaction: discord.Interaction, role: discord.Role):
+        try:
+            conn = await create_db(f"storage/{interaction.guild.id}/configuration.db")
+            await insertconfig(conn, ["supporterroleid", role.id])
+            await interaction.response.send_message(
+                content=f"""Supporter Role has been set to {role.name}""", ephemeral=True)
+        except Exception as e:
+            print(e)
+            await interaction.response.send_message(content=f"""Something went wrong.""", ephemeral=True)
+
     @welcomechannel.error
     @transcriptlogchannel.error
     @defaultrole.error
@@ -177,6 +189,18 @@ class resetcmd(commands.GroupCog, name="reset"):
             await interaction.response.send_message(
                 f"Transaction Category has been reset.",
                 ephemeral=True)
+        except Exception as e:
+            print(e)
+            await interaction.response.send_message(content=f"""Something went wrong.""", ephemeral=True)
+
+    @app_commands.checks.has_permissions(manage_roles=True)
+    @app_commands.command(name="supporter-role", description="Command to reset your server's supporter role.")
+    async def supporterrole(self, interaction: discord.Interaction):
+        try:
+            conn = await create_db(f"storage/{interaction.guild.id}/configuration.db")
+            await insertconfig(conn, ["supportroleid", 0])
+            await interaction.response.send_message(
+                content=f"""Support Role has been reset.""", ephemeral=True)
         except Exception as e:
             print(e)
             await interaction.response.send_message(content=f"""Something went wrong.""", ephemeral=True)
