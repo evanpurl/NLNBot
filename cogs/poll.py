@@ -58,7 +58,7 @@ class pollmodal(ui.Modal, title='Poll Information'):
             msgid = msg.id
 
             if self.time != 0:
-                self.time = self.time * 3600  # Converts timer from hours to seconds.
+                self.time = self.time * 60  # Converts timer from hours to seconds.
 
                 await interaction.response.send_message(
                     content=f"Poll created at {msg.jump_url}, timer started for {self.timehours} hours.",
@@ -68,10 +68,13 @@ class pollmodal(ui.Modal, title='Poll Information'):
                     await asyncio.sleep(60)
                     self.time -= 60
                     if self.time <= 0:
-                        cache_msg = discord.utils.get(self.bot.cached_messages, id=msgid)
-                        await cache_msg.reply(embed=await assemblepollendembed(self.bot, interaction.guild, cache_msg))
-                        await cache_msg.clear_reactions()  # Clears reactions from previous poll.
-                    break
+                        try:
+                            cache_msg = discord.utils.get(self.bot.cached_messages, id=msgid)
+                            await cache_msg.reply(embed=await assemblepollendembed(self.bot, interaction.guild, cache_msg))
+                            await cache_msg.clear_reactions()  # Clears reactions from previous poll.
+                            break
+                        except discord.NotFound:  # If message gets deleted or is not found.
+                            break
 
             else:
                 await interaction.response.send_message(
