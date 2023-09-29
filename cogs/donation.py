@@ -7,6 +7,7 @@ import stripe
 from discord import app_commands
 from discord.ext import commands
 
+from util.databasefunctions import create_pool, get
 from util.sqlitefunctions import create_db, getconfig
 
 stripe.api_key = os.getenv('stripesecret')
@@ -58,9 +59,10 @@ class donationcmd(commands.Cog):
                 await asyncio.sleep(1)
                 session = stripe.checkout.Session.retrieve(session.id)
 
-            conn = await create_db(f"storage/{interaction.guild.id}/configuration.db")
-            roleid = await getconfig(conn, "supporterroleid")
-            role = discord.utils.get(interaction.guild.roles, id=roleid)
+            pool = await create_pool()
+            data = await get(pool,
+                             f"""SELECT supporterroleid FROM {self.bot.user.name.replace(" ", "_")} WHERE serverid={interaction.guild.id}""")
+            role = discord.utils.get(interaction.guild.roles, id=data)
 
             if role:
                 if role not in interaction.user.roles:

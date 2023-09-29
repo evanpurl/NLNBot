@@ -2,3 +2,4 @@ discord.py
 chat_exporter
 python-dotenv
 stripe
+aiomysql

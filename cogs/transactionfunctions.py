@@ -1,7 +1,8 @@
 import discord
 from discord import app_commands
 from discord.ext import commands
-from util.sqlitefunctions import getconfig, create_db
+
+from util.databasefunctions import create_pool, get
 
 
 # Needs "manage role" perms
@@ -35,10 +36,11 @@ class transactioncmd(commands.Cog):
                 interaction.guild.me: discord.PermissionOverwrite(read_messages=True),
                 member: discord.PermissionOverwrite(read_messages=True)}
 
-            conn = await create_db(f"storage/{interaction.guild.id}/configuration.db")
-            cat = await getconfig(conn, "transactioncategoryid")
+            pool = await create_pool()
+            data = await get(pool,
+                             f"""SELECT transactioncategoryid FROM {self.bot.user.name.replace(" ", "_")} WHERE serverid={member.guild.id}""")
 
-            transactioncat = discord.utils.get(interaction.guild.categories, id=int(cat))
+            transactioncat = discord.utils.get(interaction.guild.categories, id=int(data))
             if transactioncat:
                 transactionchan = await interaction.guild.create_text_channel(
                     f"transaction-{interaction.user.name}-{member.name}", category=transactioncat,

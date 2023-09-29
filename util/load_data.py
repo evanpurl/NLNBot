@@ -1,36 +1,38 @@
-import os.path
-from sqlite3 import Error
-
-from cogs.profiles import initprofiles
-from util.sqlitefunctions import create_db, create_table, createuniqueindex
+from util.databasefunctions import create_pool, getall, createservermultiple
+from aiomysql import Error
 
 
-async def loadallservers(serverlist):
+async def loadallservers(bot, serverlist):
+    servers = []
     for a in serverlist:
-        await loaddata(a.id)
+        servers.append(a.id)
+    await loaddata(bot, servers)
 
 
-async def loadserverdata(guildid):
-    await loaddata(guildid)
-
-
-async def loaddata(guildid):
+async def loaddata(bot, guildlist):
     """
     Function that loads sqlite data.
-    :type guildid: int
+    :param guildlist:
+    :param bot:
     :return:
     """
-    if not os.path.exists(f"storage/{guildid}"):
-        os.makedirs(f"storage/{guildid}", exist_ok=True)
-    if not os.path.exists(f"storage/global"):
-        os.makedirs(f"storage/global", exist_ok=True)
     try:
-        tabledata = """CREATE TABLE IF NOT EXISTS config ( configname text NOT NULL, option integer);"""
-        conn = await create_db(f"storage/{guildid}/configuration.db")
-        await create_table(conn, tabledata)
-        await createuniqueindex(conn, f""" CREATE UNIQUE INDEX IF NOT EXISTS idx_config ON config (configname) """)
-        await initprofiles(guildid)
-        # Will add more files as needed.
-        print("Data confirmed!")
-    except Error or Exception as e:
-        print(f"load data function, guildid {guildid} ({e})")
+        pool = await create_pool()
+
+        data = await getall(pool, f"""SELECT serverid FROM {bot.user.name.replace(" ", "_")};""")
+
+        missing = set(guildlist).difference(data)
+
+        if len(missing) > 0:
+            pool = await create_pool()
+            for a in missing:
+                guild = await bot.fetch_guild(a)
+                print(f"Creating data for {guild.name}")
+                await createservermultiple(pool, f"""INSERT IGNORE INTO {bot.user.name.replace(" ", "_")} (serverid, servername) VALUES ({guild.id}, "{guild.name}");""")
+                print(f"Data confirmed for guild {guild.name}")
+            pool.close()
+
+        print("Data confirmed")
+
+    except Error as e:
+        print(f"load data function, ({e})")
