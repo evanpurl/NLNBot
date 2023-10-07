@@ -1,5 +1,6 @@
 discord.py
 chat_exporter
-python-dotenv
-stripe
-aiomysql
+python-dotenv~=1.0.0
+stripe~=6.6.0
+aiomysql~=0.2.0
+pytz~=2023.3

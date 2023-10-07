@@ -3,19 +3,22 @@ import datetime
 import discord
 from discord import app_commands, ui
 from discord.ext import commands
+from util.timeutils import timetounix
 
 
-async def assemblepollembed(bot, server, role, information, pollname):
+async def assemblepollembed(bot, server, role, information, pollname, time):
     if role is None:
         embed = discord.Embed(title=f"{pollname}",
                               description=f"Made using the poll command.", color=discord.Color.blue(),
                               timestamp=datetime.datetime.now())
     else:
         embed = discord.Embed(title=f"{pollname}",
-                              description=f"{role.mention} Made using the poll command.", color=discord.Color.blue(),
+                              description=f"{role.mention} Made using the poll command.",
+                              color=discord.Color.blue(),
                               timestamp=datetime.datetime.now())
     embed.set_thumbnail(url=server.icon.url)
     embed.add_field(name="Information", value=information, inline=False)
+    embed.add_field(name="Poll Ends:", value=time, inline=False)
     embed.set_footer(text=f"{bot.user.name}")
     return embed
 
@@ -26,8 +29,8 @@ async def assemblepollendembed(bot, server, msg):
                           description=f"Made using the poll command.", color=discord.Color.blue(),
                           timestamp=datetime.datetime.now())
     embed.set_thumbnail(url=server.icon.url)
-    embed.add_field(name="❌", value=reactions[0]-1, inline=True)
-    embed.add_field(name="✅", value=reactions[1]-1, inline=True)
+    embed.add_field(name="❌", value=reactions[0] - 1, inline=True)
+    embed.add_field(name="✅", value=reactions[1] - 1, inline=True)
     embed.set_footer(text=f"{bot.user.name}")
     return embed
 
@@ -50,7 +53,8 @@ class pollmodal(ui.Modal, title='Poll Information'):
     async def on_submit(self, interaction: discord.Interaction):
         try:
             msg = await self.channel.send(
-                embed=await assemblepollembed(self.bot, interaction.guild, self.role, self.information, self.name))
+                embed=await assemblepollembed(self.bot, interaction.guild, self.role, self.information, self.name,
+                                              await timetounix(self.timehours)))
 
             await msg.add_reaction("❌")
             await msg.add_reaction("✅")
@@ -70,7 +74,8 @@ class pollmodal(ui.Modal, title='Poll Information'):
                     if self.time <= 0:
                         try:
                             cache_msg = discord.utils.get(self.bot.cached_messages, id=msgid)
-                            await cache_msg.reply(embed=await assemblepollendembed(self.bot, interaction.guild, cache_msg))
+                            await cache_msg.reply(
+                                embed=await assemblepollendembed(self.bot, interaction.guild, cache_msg))
                             await cache_msg.clear_reactions()  # Clears reactions from previous poll.
                             break
                         except discord.NotFound:  # If message gets deleted or is not found.
@@ -96,7 +101,9 @@ class pollcmd(commands.Cog):
                    roletotag: discord.Role = None, timerhrs: int = None):
         try:
             if timerhrs == 0:
-                timerhrs = None  # Default no timer
+                timerhrs = 24  # Default 24 hour timer
+            if not timerhrs:
+                timerhrs = 24
             await interaction.response.send_modal(pollmodal(self.bot, channel, roletotag, timerhrs))
 
         except Exception as e:
