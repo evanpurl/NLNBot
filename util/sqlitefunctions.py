@@ -100,3 +100,31 @@ async def newticket(conn, guild, ticketuserid, transcriptlink):
     conn.commit()
     c.close()
     conn.close()
+
+
+async def getSEleader(conn, user):
+    try:
+        c = conn.cursor()
+        c.execute(""" SELECT roleid FROM SE WHERE userid=? """, [user])
+        roleid = c.fetchone()
+        if not roleid:
+            return 0
+        if len(roleid) == 0:
+            return 0
+        return roleid[0]
+    except Error or Exception as e:
+        print(f"get SE leader: {e}")
+        return []
+
+
+async def setSEleader(conn, configlist):
+    try:
+        datatoinsert = f""" REPLACE INTO SE(userid, roleid) VALUES( ?, ?) """
+        c = conn.cursor()
+        c.execute(datatoinsert, (configlist[0], configlist[1]))
+        conn.commit()
+        c.close()
+        conn.close()
+
+    except Error or Exception as e:
+        print(f"insert config: {e}")
