@@ -11,7 +11,7 @@ from util.databasefunctions import get, create_pool, getmultiple
 def userembed(user, server):
     embed = discord.Embed(title="**Welcome!**",
                           description=f"Welcome to {server.name} {user.mention}! Please make sure "
-                                      f"to review the rules! You are the {len([m for m in server.members if not m.bot])}th member!", color=discord.Color.blue(),
+                                      f"to review the rules! This server has {len([m for m in server.members if not m.bot])} members!", color=discord.Color.blue(),
                           timestamp=datetime.datetime.now())
     embed.set_author(name=user.name, icon_url=user.avatar)
     return embed
