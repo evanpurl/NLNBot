@@ -1,18 +1,5 @@
 import os
-import subprocess
-import sys
-
-
-def install_requirements():
-    subprocess.check_call([sys.executable, '-m', 'pip', 'install', '--upgrade', 'pip'])
-    if os.path.exists('requirements.txt'):
-        subprocess.check_call([sys.executable, '-m', 'pip', 'install', '-r', 'requirements.txt'])
-
-
-install_requirements()
-
 import asyncio
-
 import discord
 from util.load_extensions import load_extensions  # Our code
 from discord.ext import commands
