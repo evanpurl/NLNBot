@@ -69,7 +69,7 @@ class donationcmd(commands.Cog):
                 if role not in interaction.user.roles:
                     await interaction.user.add_roles(role)
                     embed = discord.Embed(title=self.bot.user.name,
-                                          description=f"Thank you for donating {interaction.user.mention}, you "
+                                          description=f"Thank you for donating {interaction.user.mention}! You "
                                                       f"have been given the role {role.mention}!",
                                           color=0x00ff00)
                 else:
