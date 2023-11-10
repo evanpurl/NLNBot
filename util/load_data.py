@@ -1,6 +1,8 @@
 from util.databasefunctions import create_pool, getall, createservermultiple
 from aiomysql import Error
 
+from util.sqlitefunctions import create_db, create_table, createuniqueindex
+
 
 async def loadallservers(bot, serverlist):
     servers = []
@@ -32,6 +34,14 @@ async def loaddata(bot, guildlist):
                 print(f"Data confirmed for guild {guild.name}")
             pool.close()
 
+        #  SE Specific Section
+        guild = await bot.fetch_guild(955962668756385792)
+        tabledata = """CREATE TABLE IF NOT EXISTS SE ( userid integer NOT NULL, roleid integer);"""
+        conn = await create_db(f"storage/{guild.id}/SE.db")
+        await create_table(conn, tabledata)
+        await createuniqueindex(conn, f""" CREATE UNIQUE INDEX IF NOT EXISTS idx_userid ON SE (userid) """)
+        print("Loaded SE Data.")
+        #
         print("Data confirmed")
 
     except Error as e:
