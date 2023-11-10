@@ -7,7 +7,6 @@ from discord import app_commands
 from discord.ext import commands
 
 from util.databasefunctions import create_pool, get
-from util.sqlitefunctions import newticket, create_db, create_table
 
 timeout = 300  # seconds
 
@@ -79,12 +78,9 @@ class ticketbuttonpanel(discord.ui.View):
         try:
             pool = await create_pool()
             data = await get(pool,
-                             f"""SELECT transcriptchannelid FROM {interaction.client.user.name.replace(" ", "_")} WHERE serverid={interaction.guild.id}""")
+                             f"""SELECT configoption FROM server_{str(interaction.guild.id)} WHERE configname='transcript_channel'""")
             logchannel = discord.utils.get(interaction.guild.channels,
                                            id=int(data))
-            conn = await create_db(f"storage/global/tickets.db")
-            await create_table(conn, """CREATE TABLE IF NOT EXISTS tickets ( servername text, ticketuserid bigint, 
-        transcriptlink text); """)
             if logchannel:
                 transcript = await chat_exporter.export(
                     interaction.channel,
@@ -98,13 +94,9 @@ class ticketbuttonpanel(discord.ui.View):
                 )
 
                 message = await logchannel.send(file=transcript_file)
-                await newticket(conn=conn, guild=interaction.guild, ticketuserid=interaction.user.id,
-                                transcriptlink=message.jump_url)
                 await interaction.channel.delete()
                 return
             else:
-                await newticket(conn=conn, guild=interaction.guild, ticketuserid=interaction.user.id,
-                                transcriptlink="None")
                 await interaction.channel.delete()
         except Exception as e:
             print(e)
@@ -126,12 +118,9 @@ class ticketbuttonpanel(discord.ui.View):
                 except asyncio.TimeoutError:
                     pool = await create_pool()
                     data = await get(pool,
-                                     f"""SELECT transcriptchannelid FROM {self.bot.user.name.replace(" ", "_")} WHERE serverid={interaction.guild.id}""")
+                                     f"""SELECT configoption FROM server_{str(interaction.guild.id)} WHERE configname='transcript_channel'""")
                     logchannel = discord.utils.get(interaction.guild.channels,
                                                    id=int(data))
-                    conn = await create_db(f"storage/global/tickets.db")
-                    await create_table(conn, """CREATE TABLE IF NOT EXISTS tickets ( servername text, ticketuserid bigint, 
-                            transcriptlink text); """)
                     if logchannel:
                         transcript = await chat_exporter.export(
                             interaction.channel,
@@ -145,13 +134,9 @@ class ticketbuttonpanel(discord.ui.View):
                         )
 
                         message = await logchannel.send(file=transcript_file)
-                        await newticket(conn=conn, guild=interaction.guild, ticketuserid=interaction.user.id,
-                                        transcriptlink=message.jump_url)
                         await interaction.channel.delete()
                         return
                     else:
-                        await newticket(conn=conn, guild=interaction.guild, ticketuserid=interaction.user.id,
-                                        transcriptlink="None")
                         await interaction.channel.delete()
             else:
                 await interaction.response.send_message(content="You don't have permission to do that.", ephemeral=True)
@@ -181,7 +166,7 @@ class ticketbutton(discord.ui.View):
                     interaction.guild.me: discord.PermissionOverwrite(read_messages=True)}
                 pool = await create_pool()
                 data = await get(pool,
-                                 f"""SELECT ticketcategoryid FROM {interaction.client.user.name.replace(" ", "_")} WHERE serverid={interaction.guild.id}""")
+                                 f"""SELECT configoption FROM server_{str(interaction.guild.id)} WHERE configname='ticket_category'""")
                 ticketcat = discord.utils.get(interaction.guild.categories, id=int(data))
                 if ticketcat:
                     ticketchan = await interaction.guild.create_text_channel(
@@ -206,7 +191,7 @@ class ticketbutton(discord.ui.View):
                     except asyncio.TimeoutError:
                         pool = await create_pool()
                         data = await get(pool,
-                                         f"""SELECT transcriptchannelid FROM {self.bot.user.name.replace(" ", "_")} WHERE serverid={interaction.guild.id}""")
+                                         f"""SELECT configoption FROM server_{str(interaction.guild.id)} WHERE configname='transcript_channel'""")
                         logchannel = discord.utils.get(interaction.guild.channels,
                                                        id=int(data))
                         if logchannel:
@@ -247,7 +232,7 @@ class ticketbutton(discord.ui.View):
                     except asyncio.TimeoutError:
                         pool = await create_pool()
                         data = await get(pool,
-                                         f"""SELECT transcriptchannelid FROM {self.bot.user.name.replace(" ", "_")} WHERE serverid={interaction.guild.id}""")
+                                         f"""SELECT configoption FROM server_{str(interaction.guild.id)} WHERE configname='transcript_channel'""")
                         logchannel = discord.utils.get(interaction.guild.channels,
                                                        id=int(data))
                         if logchannel:

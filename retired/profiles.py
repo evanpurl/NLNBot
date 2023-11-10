@@ -5,7 +5,7 @@ import discord
 from discord import app_commands, ui
 from discord.ext import commands
 
-from util.sqlitefunctions import create_db, create_table, createuniqueindex, getprofileconfig
+from retired.sqlitefunctions import create_db, create_table, createuniqueindex, getprofileconfig
 
 
 async def getprofile(server, userid):

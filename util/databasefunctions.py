@@ -8,11 +8,36 @@ load_dotenv()
 
 
 async def create_pool():
-    pool = await aiomysql.create_pool(host=os.getenv('host'), port=int(os.getenv('port')),
-                                      user=os.getenv('user'), password=os.getenv('password'),
-                                      db=os.getenv('db'))
+    try:
+        pool = await aiomysql.create_pool(host=os.getenv('host'), port=int(os.getenv('port')),
+                                          user=os.getenv('user'), password=os.getenv('password'),
+                                          db=os.getenv('db'))
 
-    return pool
+        return pool
+    except Exception or Error as e:
+        print(f"Create Pool: {e}")
+
+
+async def create_table(pool, mysql, data):
+    try:
+        async with pool.acquire() as conn:
+            async with conn.cursor() as cur:
+                await cur.execute(mysql, (data,))
+                await conn.commit()
+                await cur.close()
+    except Error or Exception as e:
+        print(f"Create Table: {e}")
+
+
+async def create_unique_index(pool, mysql, data):
+    try:
+        async with pool.acquire() as conn:
+            async with conn.cursor() as cur:
+                await cur.execute(mysql, data)
+                await conn.commit()
+                await cur.close()
+    except Error or Exception as e:
+        print(f"createuniqueindex: {e}")
 
 
 async def insert(pool, mysql):
@@ -33,16 +58,13 @@ async def get(pool, mysql):
             async with conn.cursor() as cur:
                 await cur.execute(mysql)
                 result = await cur.fetchone()
-
-        pool.close()
-        await pool.wait_closed()
         if not result:
             return 0
         if len(result) == 0:
             return 0
         return result[0]
     except Exception as e:
-        print(e)
+        print(f"Get: {e}")
 
 
 async def getmultiple(pool, mysql):
@@ -108,7 +130,7 @@ async def createservermultiple(pool, mysql):
         return e
 
 
-async def deleteserver(pool, mysql):
+async def drop_server(pool, mysql):
     try:
         async with pool.acquire() as conn:
             async with conn.cursor() as cur:

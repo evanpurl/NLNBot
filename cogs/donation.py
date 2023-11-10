@@ -1,5 +1,4 @@
 import asyncio
-import datetime
 import os
 
 import discord
@@ -8,7 +7,6 @@ from discord import app_commands
 from discord.ext import commands
 
 from util.databasefunctions import create_pool, get
-from util.sqlitefunctions import create_db, getconfig
 
 stripe.api_key = os.getenv('stripesecret')
 
@@ -62,7 +60,7 @@ class donationcmd(commands.Cog):
 
             pool = await create_pool()
             data = await get(pool,
-                             f"""SELECT supporterroleid FROM {self.bot.user.name.replace(" ", "_")} WHERE serverid={interaction.guild.id}""")
+                             f"""SELECT configoption FROM server_{str(interaction.guild.id)} WHERE configname='supporter_role'""")
             role = discord.utils.get(interaction.guild.roles, id=data)
 
             if role:

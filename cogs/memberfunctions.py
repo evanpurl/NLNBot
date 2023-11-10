@@ -3,15 +3,14 @@ import datetime
 import discord
 from discord.ext import commands
 
-from util.databasefunctions import get, create_pool, getmultiple
-
-"needs welcomechannelid in db"
+from util.databasefunctions import get, create_pool
 
 
 def userembed(user, server):
     embed = discord.Embed(title="**Welcome!**",
                           description=f"Welcome to {server.name} {user.mention}! Please make sure "
-                                      f"to review the rules! This server has {len([m for m in server.members if not m.bot])} members!", color=discord.Color.blue(),
+                                      f"to review the rules! This server has {len([m for m in server.members if not m.bot])} members!",
+                          color=discord.Color.blue(),
                           timestamp=datetime.datetime.now())
     embed.set_author(name=user.name, icon_url=user.avatar)
     return embed
@@ -33,13 +32,14 @@ class memberfunctions(commands.Cog):
     async def on_member_join(self, member):
         try:
             pool = await create_pool()
-            data = await getmultiple(pool,
-                                     f"""SELECT welcomechannelid, defaultroleid FROM {self.bot.user.name.replace(" ", "_")} WHERE 
-                                     serverid={member.guild.id}""")
-            channel = discord.utils.get(member.guild.channels, id=data[0])
+            welcome_channel = await get(pool,
+                                        f"""SELECT configoption FROM server_{str(member.guild.id)} WHERE configname='welcome_channel'""")
+            default_role = await get(pool,
+                                     f"""SELECT configoption FROM server_{str(member.guild.id)} WHERE configname='default_role'""")
+            channel = discord.utils.get(member.guild.channels, id=welcome_channel)
             if channel:
                 await channel.send(embed=userembed(member, member.guild))
-            role = discord.utils.get(member.guild.roles, id=data[1])
+            role = discord.utils.get(member.guild.roles, id=default_role)
             if role:
                 await member.add_roles(role)
         except Exception as e:
@@ -48,9 +48,9 @@ class memberfunctions(commands.Cog):
     @commands.Cog.listener()
     async def on_member_remove(self, member):
         pool = await create_pool()
-        data = await get(pool,
-                         f"""SELECT goodbyechannelid FROM {self.bot.user.name.replace(" ", "_")} WHERE serverid={member.guild.id}""")
-        channel = discord.utils.get(member.guild.channels, id=data)
+        goodbye_channel = await get(pool,
+                                    f"""SELECT configoption FROM server_{str(member.guild.id)} WHERE configname='goodbye_channel'""")
+        channel = discord.utils.get(member.guild.channels, id=goodbye_channel)
         if channel:
             await channel.send(embed=userembedbye(member))
 

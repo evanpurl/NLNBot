@@ -2,8 +2,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from util.databasefunctions import create_pool, get
-from util.sqlitefunctions import setSEleader, getSEleader, create_db
+from util.databasefunctions import create_pool, get, insert
 
 # ----------------------- SE Section
 
@@ -27,8 +26,8 @@ class SEcommands(commands.Cog):
                     discord.PermissionOverwrite(read_messages=True, send_messages=True)
                     await user.add_roles(leadrole)
 
-                conn = await create_db(f"storage/{interaction.guild.id}/SE.db")
-                await setSEleader(conn, [user.id, role.id])
+                conn = await create_pool()
+                await insert(conn, f"""REPLACE INTO SE_955962668756385792(userid, roleid) VALUES( {user.id}, {role.id})""")
                 await interaction.response.send_message(
                     content=f"""Player __{user.name}__ has been added as a faction lead to faction **{role.name}**""",
                     ephemeral=True)
@@ -40,8 +39,9 @@ class SEcommands(commands.Cog):
     @app_commands.command(name="factionadd", description="Slash command to add player to faction role")
     async def factionadd(self, interaction: discord.Interaction, user: discord.User):
         try:
-            conn = await create_db(f"storage/{interaction.guild.id}/SE.db")
-            leader = await getSEleader(conn, interaction.user.id)
+            conn = await create_pool()
+            leader = await get(conn, f""" SELECT roleid FROM SE_955962668756385792 WHERE userid={interaction.user.id} """)
+            print(leader)
             if leader:
                 leadrole = discord.utils.get(interaction.guild.roles, id=leader)
                 if leadrole not in user.roles:
@@ -64,8 +64,8 @@ class SEcommands(commands.Cog):
     @app_commands.command(name="factionremove", description="Slash command to remove players from faction role")
     async def factionremove(self, interaction: discord.Interaction, user: discord.User):
         try:
-            conn = await create_db(f"storage/{interaction.guild.id}/SE.db")
-            leader = await getSEleader(conn, interaction.user.id)
+            conn = await create_pool()
+            leader = await get(conn, f""" SELECT roleid FROM SE_955962668756385792 WHERE userid={interaction.user.id} """)
             if leader:
                 leadrole = discord.utils.get(interaction.guild.roles, id=leader)
                 if leadrole in user.roles:
