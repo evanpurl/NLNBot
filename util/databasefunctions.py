@@ -22,7 +22,7 @@ async def create_table(pool, mysql, data):
     try:
         async with pool.acquire() as conn:
             async with conn.cursor() as cur:
-                await cur.execute(mysql, (data,))
+                await cur.execute(mysql, data)
                 await conn.commit()
                 await cur.close()
     except Error or Exception as e:

@@ -14,10 +14,10 @@ class guildfunctions(commands.Cog):
 
         await create_table(pool,
                            f"""CREATE TABLE IF NOT EXISTS server_%s ( configname text, configoption text );""",
-                           str(guild.id))
+                           guild.id)
         await create_unique_index(pool,
                                   f""" CREATE UNIQUE INDEX IF NOT EXISTS idx_configname ON server_%s (configname); """,
-                                  str(guild.id))
+                                  guild.id)
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild):
