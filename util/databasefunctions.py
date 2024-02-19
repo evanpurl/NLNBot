@@ -45,8 +45,6 @@ async def insert(pool, mysql):
             async with conn.cursor() as cur:
                 await cur.execute(mysql)
                 await conn.commit()
-        pool.close()
-        await pool.wait_closed()
     except Error as e:
         print(e)
 
@@ -91,8 +89,6 @@ async def getall(pool, mysql):
                 await cur.execute(mysql)
                 result = await cur.fetchall()
 
-        pool.close()
-        await pool.wait_closed()
         if not result:
             return [0]
         if len(result) == 0:
@@ -111,8 +107,6 @@ async def createserver(pool, mysql):
             async with conn.cursor() as cur:
                 await cur.execute(mysql)
                 await conn.commit()
-        pool.close()
-        await pool.wait_closed()
     except Exception as e:
         print(e)
         return e
@@ -135,8 +129,6 @@ async def drop_server(pool, mysql):
             async with conn.cursor() as cur:
                 await cur.execute(mysql)
                 await conn.commit()
-        pool.close()
-        await pool.wait_closed()
     except Exception as e:
         print(e)
         return e
