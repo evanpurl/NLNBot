@@ -1,4 +1,4 @@
-from util.databasefunctions import create_pool, create_table, create_unique_index
+from util.databasefunctions import create_table, create_unique_index
 from aiomysql import Error
 
 
@@ -11,13 +11,6 @@ async def loadallservers(bot):
             await create_unique_index(bot.database,
                                       f""" CREATE UNIQUE INDEX IF NOT EXISTS idx_configname ON server_%s (configname); """,
                                       a.id)
-
-        #  SE Data
-        se = 955962668756385792
-        await create_table(bot.database, f"""CREATE TABLE IF NOT EXISTS SE_%s ( userid bigint NOT NULL, roleid bigint );""",
-                           se)
-        await create_unique_index(bot.database, f""" CREATE UNIQUE INDEX IF NOT EXISTS idx_userid ON SE_%s (userid);""", se)
-        #
 
         print("Data confirmed")
 

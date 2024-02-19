@@ -21,6 +21,7 @@ async def main():
         try:
             token = os.getenv('token')
             client.database = await create_pool()
+            print("Connected to Bot Database!")
             await load_extensions(client)
             print("Bot Ready!")
             await client.start(token)

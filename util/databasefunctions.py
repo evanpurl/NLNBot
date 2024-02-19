@@ -12,8 +12,6 @@ async def create_pool():
         pool = await aiomysql.create_pool(host=os.getenv('host'), port=int(os.getenv('port')),
                                           user=os.getenv('user'), password=os.getenv('password'),
                                           db=os.getenv('db'))
-
-        print("Connected to database!")
         return pool
     except Exception or Error as e:
         print(f"Create Pool: {e}")
