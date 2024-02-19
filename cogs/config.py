@@ -3,7 +3,7 @@ from discord import app_commands
 from discord.ext import commands
 from aiomysql import Error
 
-from util.databasefunctions import create_pool, insert
+from util.databasefunctions import insert
 
 
 class setcmd(commands.GroupCog, name="set"):
@@ -16,8 +16,7 @@ class setcmd(commands.GroupCog, name="set"):
     async def welcomechannel(self, interaction: discord.Interaction, channel: discord.TextChannel):
         try:
 
-            pool = await create_pool()
-            await insert(pool, f"""REPLACE INTO server_{str(interaction.guild.id)} (configname, configoption) VALUES( 'welcome_channel', {channel.id})""")
+            await insert(self.bot.database, f"""REPLACE INTO server_{str(interaction.guild.id)} (configname, configoption) VALUES( 'welcome_channel', {channel.id})""")
             await interaction.response.send_message(
                 f"Welcome Channel has been set to {discord.utils.get(interaction.guild.channels, id=channel.id).mention}.",
                 ephemeral=True)
@@ -29,8 +28,7 @@ class setcmd(commands.GroupCog, name="set"):
     @app_commands.command(name="goodbye-channel", description="Command to set your server's goodbye channel.")
     async def goodbyechannel(self, interaction: discord.Interaction, channel: discord.TextChannel):
         try:
-            pool = await create_pool()
-            await insert(pool,
+            await insert(self.bot.database,
                          f"""REPLACE INTO server_{str(interaction.guild.id)} (configname, configoption) VALUES( 'goodbye_channel', {channel.id})""")
             await interaction.response.send_message(
                 f"Goodbye Channel has been set to {discord.utils.get(interaction.guild.channels, id=channel.id)}.",
@@ -43,8 +41,7 @@ class setcmd(commands.GroupCog, name="set"):
     @app_commands.command(name="ticket-category", description="Command to set your server's ticket category.")
     async def ticketcategory(self, interaction: discord.Interaction, category: discord.CategoryChannel):
         try:
-            pool = await create_pool()
-            await insert(pool,
+            await insert(self.bot.database,
                          f"""REPLACE INTO server_{str(interaction.guild.id)} (configname, configoption) VALUES( 'ticket_category', {category.id})""")
             await interaction.response.send_message(
                 f"Ticket Category has been set to {discord.utils.get(interaction.guild.categories, id=category.id)}.",
@@ -58,8 +55,7 @@ class setcmd(commands.GroupCog, name="set"):
                           description="Command to set your server's transcript log channel.")
     async def transcriptlogchannel(self, interaction: discord.Interaction, channel: discord.TextChannel):
         try:
-            pool = await create_pool()
-            await insert(pool,
+            await insert(self.bot.database,
                          f"""REPLACE INTO server_{str(interaction.guild.id)} (configname, configoption) VALUES( 'transcript_channel', {channel.id})""")
             await interaction.response.send_message(
                 f"Transcript Log Channel has been set to {discord.utils.get(interaction.guild.channels, id=channel.id)}.",
@@ -72,8 +68,7 @@ class setcmd(commands.GroupCog, name="set"):
     @app_commands.command(name="default-role", description="Command for setting your server's Default role.")
     async def defaultrole(self, interaction: discord.Interaction, role: discord.Role):
         try:
-            pool = await create_pool()
-            await insert(pool,
+            await insert(self.bot.database,
                          f"""REPLACE INTO server_{str(interaction.guild.id)} (configname, configoption) VALUES( 'default_role', {role.id})""")
             await interaction.response.send_message(
                 content=f"""Default Role has been set to {role.name}""", ephemeral=True)
@@ -85,8 +80,7 @@ class setcmd(commands.GroupCog, name="set"):
     @app_commands.command(name="supporter-role", description="Command for setting your server's supporter role.")
     async def supporterrole(self, interaction: discord.Interaction, role: discord.Role):
         try:
-            pool = await create_pool()
-            await insert(pool,
+            await insert(self.bot.database,
                          f"""REPLACE INTO server_{str(interaction.guild.id)} (configname, configoption) VALUES( 'supporter_role', {role.id})""")
             await interaction.response.send_message(
                 content=f"""Supporter Role has been set to {role.name}""", ephemeral=True)
@@ -112,8 +106,7 @@ class resetcmd(commands.GroupCog, name="reset"):
     @app_commands.command(name="welcome-channel", description="Command to reset your server's welcome channel.")
     async def welcomechannel(self, interaction: discord.Interaction):
         try:
-            pool = await create_pool()
-            await insert(pool,
+            await insert(self.bot.database,
                          f"""REPLACE INTO server_{str(interaction.guild.id)} (configname, configoption) VALUES( 'welcome_channel', 0)""")
             await interaction.response.send_message(
                 f"Welcome Channel has been reset.",
@@ -126,8 +119,7 @@ class resetcmd(commands.GroupCog, name="reset"):
     @app_commands.command(name="goodbye-channel", description="Command to reset your server's goodbye channel.")
     async def goodbyechannel(self, interaction: discord.Interaction):
         try:
-            pool = await create_pool()
-            await insert(pool,
+            await insert(self.bot.database,
                          f"""REPLACE INTO server_{str(interaction.guild.id)} (configname, configoption) VALUES( 'goodbye_channel', 0)""")
             await interaction.response.send_message(
                 f"Goodbye Channel has been reset.",
@@ -140,8 +132,7 @@ class resetcmd(commands.GroupCog, name="reset"):
     @app_commands.command(name="ticket-category", description="Command to reset your server's ticket category.")
     async def ticketcategory(self, interaction: discord.Interaction):
         try:
-            pool = await create_pool()
-            await insert(pool,
+            await insert(self.bot.database,
                          f"""REPLACE INTO server_{str(interaction.guild.id)} (configname, configoption) VALUES( 'ticket_category', 0)""")
             await interaction.response.send_message(
                 f"Ticket Category has been reset.",
@@ -155,8 +146,7 @@ class resetcmd(commands.GroupCog, name="reset"):
                           description="Command to reset your server's transcript log channel.")
     async def transcriptlogchannel(self, interaction: discord.Interaction):
         try:
-            pool = await create_pool()
-            await insert(pool,
+            await insert(self.bot.database,
                          f"""REPLACE INTO server_{str(interaction.guild.id)} (configname, configoption) VALUES( 'transcript_channel', 0)""")
             await interaction.response.send_message(
                 f"Transcript log channel has been reset.",
@@ -169,8 +159,7 @@ class resetcmd(commands.GroupCog, name="reset"):
     @app_commands.command(name="default-role", description="Command to reset your server's Default role.")
     async def defaultrole(self, interaction: discord.Interaction):
         try:
-            pool = await create_pool()
-            await insert(pool,
+            await insert(self.bot.database,
                          f"""REPLACE INTO server_{str(interaction.guild.id)} (configname, configoption) VALUES( 'default_role', 0)""")
             await interaction.response.send_message(
                 content=f"""Default Role has been reset.""", ephemeral=True)
@@ -182,8 +171,7 @@ class resetcmd(commands.GroupCog, name="reset"):
     @app_commands.command(name="supporter-role", description="Command to reset your server's supporter role.")
     async def supporterrole(self, interaction: discord.Interaction):
         try:
-            pool = await create_pool()
-            await insert(pool,
+            await insert(self.bot.database,
                          f"""REPLACE INTO server_{str(interaction.guild.id)} (configname, configoption) VALUES( 'supporter_role', 0)""")
             await interaction.response.send_message(
                 content=f"""Support Role has been reset.""", ephemeral=True)

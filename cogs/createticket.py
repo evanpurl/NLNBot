@@ -6,7 +6,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from util.databasefunctions import create_pool, get
+from util.databasefunctions import get
 
 timeout = 300  # seconds
 
@@ -76,8 +76,7 @@ class ticketbuttonpanel(discord.ui.View):
                        custom_id="ticket:close")
     async def close_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         try:
-            pool = await create_pool()
-            data = await get(pool,
+            data = await get(interaction.client.database,
                              f"""SELECT configoption FROM server_{str(interaction.guild.id)} WHERE configname='transcript_channel'""")
             logchannel = discord.utils.get(interaction.guild.channels,
                                            id=int(data))
@@ -116,8 +115,7 @@ class ticketbuttonpanel(discord.ui.View):
                     while True:
                         msg = await interaction.client.wait_for('message', check=check, timeout=timeout)
                 except asyncio.TimeoutError:
-                    pool = await create_pool()
-                    data = await get(pool,
+                    data = await get(interaction.client.database,
                                      f"""SELECT configoption FROM server_{str(interaction.guild.id)} WHERE configname='transcript_channel'""")
                     logchannel = discord.utils.get(interaction.guild.channels,
                                                    id=int(data))
@@ -164,8 +162,7 @@ class ticketbutton(discord.ui.View):
                     interaction.guild.default_role: discord.PermissionOverwrite(read_messages=False),
                     interaction.user: discord.PermissionOverwrite(read_messages=True),
                     interaction.guild.me: discord.PermissionOverwrite(read_messages=True)}
-                pool = await create_pool()
-                data = await get(pool,
+                data = await get(interaction.client.database,
                                  f"""SELECT configoption FROM server_{str(interaction.guild.id)} WHERE configname='ticket_category'""")
                 ticketcat = discord.utils.get(interaction.guild.categories, id=int(data))
                 if ticketcat:
@@ -189,8 +186,7 @@ class ticketbutton(discord.ui.View):
                     try:
                         msg = await interaction.client.wait_for('message', check=check, timeout=timeout)
                     except asyncio.TimeoutError:
-                        pool = await create_pool()
-                        data = await get(pool,
+                        data = await get(interaction.client.database,
                                          f"""SELECT configoption FROM server_{str(interaction.guild.id)} WHERE configname='transcript_channel'""")
                         logchannel = discord.utils.get(interaction.guild.channels,
                                                        id=int(data))
@@ -230,8 +226,7 @@ class ticketbutton(discord.ui.View):
                     try:
                         msg = await interaction.client.wait_for('message', check=check, timeout=timeout)
                     except asyncio.TimeoutError:
-                        pool = await create_pool()
-                        data = await get(pool,
+                        data = await get(interaction.client.database,
                                          f"""SELECT configoption FROM server_{str(interaction.guild.id)} WHERE configname='transcript_channel'""")
                         logchannel = discord.utils.get(interaction.guild.channels,
                                                        id=int(data))

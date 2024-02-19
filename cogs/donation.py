@@ -6,7 +6,7 @@ import stripe
 from discord import app_commands
 from discord.ext import commands
 
-from util.databasefunctions import create_pool, get
+from util.databasefunctions import get
 
 stripe.api_key = os.getenv('stripesecret')
 
@@ -58,8 +58,7 @@ class donationcmd(commands.Cog):
                 await asyncio.sleep(1)
                 session = stripe.checkout.Session.retrieve(session.id)
 
-            pool = await create_pool()
-            data = await get(pool,
+            data = await get(self.bot.database,
                              f"""SELECT configoption FROM server_{str(interaction.guild.id)} WHERE configname='supporter_role'""")
             role = discord.utils.get(interaction.guild.roles, id=data)
 

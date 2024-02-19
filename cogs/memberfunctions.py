@@ -3,7 +3,7 @@ import datetime
 import discord
 from discord.ext import commands
 
-from util.databasefunctions import get, create_pool
+from util.databasefunctions import get
 
 
 def userembed(user, server):
@@ -31,10 +31,9 @@ class memberfunctions(commands.Cog):
     @commands.Cog.listener()
     async def on_member_join(self, member):
         try:
-            pool = await create_pool()
-            welcome_channel = await get(pool,
+            welcome_channel = await get(self.bot.database,
                                         f"""SELECT configoption FROM server_{str(member.guild.id)} WHERE configname='welcome_channel'""")
-            default_role = await get(pool,
+            default_role = await get(self.bot.database,
                                      f"""SELECT configoption FROM server_{str(member.guild.id)} WHERE configname='default_role'""")
             channel = discord.utils.get(member.guild.channels, id=welcome_channel)
             if channel:
@@ -47,8 +46,7 @@ class memberfunctions(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):
-        pool = await create_pool()
-        goodbye_channel = await get(pool,
+        goodbye_channel = await get(self.bot.database,
                                     f"""SELECT configoption FROM server_{str(member.guild.id)} WHERE configname='goodbye_channel'""")
         channel = discord.utils.get(member.guild.channels, id=goodbye_channel)
         if channel:
