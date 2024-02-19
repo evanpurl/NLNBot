@@ -1,4 +1,5 @@
 from discord.ext import commands
+from util.load_data import loadallservers
 
 
 class onready(commands.Cog):
@@ -9,6 +10,7 @@ class onready(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         await self.bot.wait_until_ready()
+        await loadallservers(self.bot)
         print(f"Confirming server data.")
         print(f'We have logged in as {self.bot.user}')
 

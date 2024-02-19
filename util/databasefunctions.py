@@ -13,6 +13,7 @@ async def create_pool():
                                           user=os.getenv('user'), password=os.getenv('password'),
                                           db=os.getenv('db'))
 
+        print("Connected to database!")
         return pool
     except Exception or Error as e:
         print(f"Create Pool: {e}")

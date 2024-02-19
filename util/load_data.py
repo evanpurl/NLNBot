@@ -4,20 +4,19 @@ from aiomysql import Error
 
 async def loadallservers(bot):
     try:
-        pool = await create_pool()
         for a in bot.guilds:
-            await create_table(pool,
+            await create_table(bot.database,
                                f"""CREATE TABLE IF NOT EXISTS server_%s ( configname text, configoption text );""",
                                a.id)
-            await create_unique_index(pool,
+            await create_unique_index(bot.database,
                                       f""" CREATE UNIQUE INDEX IF NOT EXISTS idx_configname ON server_%s (configname); """,
                                       a.id)
 
         #  SE Data
         se = 955962668756385792
-        await create_table(pool, f"""CREATE TABLE IF NOT EXISTS SE_%s ( userid bigint NOT NULL, roleid bigint );""",
+        await create_table(bot.database, f"""CREATE TABLE IF NOT EXISTS SE_%s ( userid bigint NOT NULL, roleid bigint );""",
                            se)
-        await create_unique_index(pool, f""" CREATE UNIQUE INDEX IF NOT EXISTS idx_userid ON SE_%s (userid);""", se)
+        await create_unique_index(bot.database, f""" CREATE UNIQUE INDEX IF NOT EXISTS idx_userid ON SE_%s (userid);""", se)
         #
 
         print("Data confirmed")
