@@ -36,7 +36,6 @@ class donationcmd(commands.Cog):
             prod = find_prodid(itemlist, "donation")
             item = stripe.Product.retrieve(prod)
             price = stripe.Price.list(product=item).data[0]
-            print(price)
             session = stripe.checkout.Session.create(
                 payment_method_types=['card'],
                 line_items=[{
