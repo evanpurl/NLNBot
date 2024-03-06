@@ -1,5 +1,5 @@
 discord.py
-chat_exporter
+chat-exporter
 python-dotenv
 stripe
 aiomysql
