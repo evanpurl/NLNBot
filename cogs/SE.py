@@ -86,29 +86,17 @@ class SEcommands(commands.Cog):
     async def factioncreate(self, interaction: discord.Interaction, factionname: str):
         try:
             await interaction.response.defer(ephemeral=True)
-            data = await get(self.bot.database,
-                             f"""SELECT defaultroleid FROM {self.bot.user.name.replace(" ", "_")} WHERE serverid={interaction.guild.id}""")
-            role = discord.utils.get(interaction.guild.roles, id=data)
 
             faction = await interaction.guild.create_role(name=factionname)
 
-            if role:
-                overwrites = {
-                    interaction.guild.default_role: discord.PermissionOverwrite(read_messages=False, connect=False),
-                    role: discord.PermissionOverwrite(read_messages=False, connect=False),
-                    faction: discord.PermissionOverwrite(read_messages=True, send_messages=True, connect=True,
-                                                         speak=True)
-                }
-            else:
-                overwrites = {
-                    interaction.guild.default_role: discord.PermissionOverwrite(read_messages=False, connect=False),
-                    faction: discord.PermissionOverwrite(read_messages=True, send_messages=True, connect=True,
-                                                         speak=True)
-                }
+            overwrites = {
+                interaction.guild.default_role: discord.PermissionOverwrite(read_messages=False, connect=False),
+                faction: discord.PermissionOverwrite(read_messages=True, send_messages=True, connect=True,
+                                                     speak=True)
+            }
             category = await interaction.guild.create_category(name=factionname, overwrites=overwrites)
             textchannel = await interaction.guild.create_text_channel(name=f"{factionname}-general", category=category)
             await interaction.guild.create_voice_channel(name=f"{factionname} voice", category=category)
-            await interaction.guild.create_text_channel(name=f"{factionname}-ingame", category=category)
 
             await interaction.followup.send(
                 content=f"""Faction {factionname} role and channels created. {textchannel.mention}""", ephemeral=True)
